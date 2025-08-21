@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI绘本故事 - 儿童专属</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 头部导航 -->
+        <header class="header">
+            <h1 class="app-title">
+                <i class="fas fa-book-open"></i>
+                AI绘本故事
+            </h1>
+            <p class="app-subtitle">为3-8岁小朋友量身定制</p>
+        </header>
+
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            <!-- 故事创作区域 -->
+            <section class="story-creator" id="storyCreator">
+                <div class="creator-card">
+                    <h2 class="section-title">
+                        <i class="fas fa-magic"></i>
+                        创作你的故事
+                    </h2>
+                    
+                    <div class="input-group">
+                        <label for="storyTheme" class="input-label">
+                            <i class="fas fa-lightbulb"></i>
+                            告诉我你想听什么故事吧~
+                        </label>
+                        <textarea 
+                            id="storyTheme" 
+                            class="story-input" 
+                            placeholder="比如：勇敢的小兔子、神奇的森林、友谊的力量..."
+                            rows="3"
+                        ></textarea>
+                    </div>
+                    
+                    <button id="generateStoryBtn" class="generate-btn">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        <span>开始创作故事</span>
+                        <div class="loading-spinner hidden"></div>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 故事展示区域 -->
+            <section class="story-display" id="storyDisplay">
+                <div class="story-card hidden">
+                    <div class="story-header">
+                        <h2 class="story-title" id="storyTitle">故事标题</h2>
+                        <div class="story-controls">
+                            <button id="playPauseBtn" class="control-btn">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button id="stopBtn" class="control-btn">
+                                <i class="fas fa-stop"></i>
+                            </button>
+                            <button id="regenerateBtn" class="control-btn secondary">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="story-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <span class="progress-text" id="progressText">0 / 0</span>
+                    </div>
+                    
+                    <div class="story-content" id="storyContent">
+                        <!-- 故事段落将在这里动态生成 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 加载状态 -->
+            <section class="loading-section hidden" id="loadingSection">
+                <div class="loading-card">
+                    <div class="loading-animation">
+                        <i class="fas fa-book-open rotating"></i>
+                    </div>
+                    <h3 class="loading-title">正在创作你的故事...</h3>
+                    <p class="loading-text" id="loadingText">请稍等，AI正在为你编写精彩的故事</p>
+                    <div class="loading-progress">
+                        <div class="progress-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 底部信息 -->
+        <footer class="footer">
+            <p>© 2024 AI绘本故事 - 让想象力飞翔</p>
+        </footer>
+    </div>
+
+    <!-- 错误提示模态框 -->
+    <div class="modal hidden" id="errorModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    提示
+                </h3>
+                <button class="modal-close" id="closeErrorModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="errorMessage">发生了一些问题，请稍后重试</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="confirmError">我知道了</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/imageLibrary.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

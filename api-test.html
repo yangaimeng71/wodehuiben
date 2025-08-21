@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API测试页面</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #007acc;
+        }
+        .test-button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .test-button:hover {
+            background: #005a9f;
+        }
+        .result {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success { border-left: 4px solid #28a745; }
+        .error { border-left: 4px solid #dc3545; }
+        .warning { border-left: 4px solid #ffc107; }
+    </style>
+</head>
+<body>
+    <h1>🔧 API调试工具</h1>
+    <p>用于测试故事生成和图片生成API的连接状态</p>
+
+    <div class="test-section">
+        <h2>📚 故事生成API测试</h2>
+        <p>测试火山引擎API连接</p>
+        <button class="test-button" onclick="testStoryAPI()">测试故事API</button>
+        <div id="storyResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎨 图片生成API测试</h2>
+        <p>测试阿里云文生图API连接</p>
+        <button class="test-button" onclick="testImageAPI()">测试图片API</button>
+        <button class="test-button" onclick="testCORSProxy()">测试CORS代理</button>
+        <div id="imageResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🌐 网络连接测试</h2>
+        <p>检查基本网络连接和跨域设置</p>
+        <button class="test-button" onclick="testNetworkConnection()">测试网络连接</button>
+        <div id="networkResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>💡 建议的解决方案</h2>
+        <div class="result warning">
+            <strong>针对图片生成失败的解决方案：</strong>
+            
+            1. <strong>使用CORS代理</strong>
+               - 部署到支持服务端代理的平台
+               - 使用Netlify Functions或Vercel Functions
+            
+            2. <strong>替代API服务</strong>
+               - 使用支持CORS的图片生成服务
+               - 集成免费的图片API（如Unsplash、Pixabay）
+            
+            3. <strong>本地图片库</strong>
+               - 准备一套儿童友好的插图素材
+               - 根据关键词智能匹配图片
+            
+            4. <strong>改进的占位图</strong>
+               - 使用CSS和SVG创建更美观的占位图
+               - 添加动画效果增强视觉体验
+        </div>
+    </div>
+
+    <script>
+        // 配置信息（请替换为实际值）
+        const API_CONFIG = {
+            volcano: {
+                url: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
+                key: '893b9f2c-3b3c-4943-a482-5ab6dde65007',
+                model: 'deepseek-r1-250528'
+            },
+            aliyun: {
+                key: 'sk-b4e340d0f9d44156b1086eed3630a2e0',
+                url: 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text2image/image-synthesis'
+            }
+        };
+
+        // 测试故事生成API
+        async function testStoryAPI() {
+            const resultDiv = document.getElementById('storyResult');
+            resultDiv.innerHTML = '正在测试故事API...';
+            resultDiv.className = 'result';
+
+            try {
+                const response = await fetch(API_CONFIG.volcano.url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_CONFIG.volcano.key}`
+                    },
+                    body: JSON.stringify({
+                        model: API_CONFIG.volcano.model,
+                        messages: [
+                            { role: "system", content: "你是人工智能助手." },
+                            { role: "user", content: "请简单介绍一下自己" }
+                        ],
+                        max_tokens: 100
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `✅ 故事API连接成功！\n响应: ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `❌ 故事API请求失败\n状态码: ${response.status}\n错误信息: ${errorText}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ 故事API连接失败\n错误信息: ${error.message}\n可能原因: 网络问题或CORS限制`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        // 测试图片生成API
+        async function testImageAPI() {
+            const resultDiv = document.getElementById('imageResult');
+            resultDiv.innerHTML = '正在测试图片API...';
+            resultDiv.className = 'result';
+
+            try {
+                const response = await fetch(API_CONFIG.aliyun.url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_CONFIG.aliyun.key}`
+                    },
+                    body: JSON.stringify({
+                        model: 'wanx-v1',
+                        input: {
+                            prompt: 'cute cartoon cat in a garden',
+                            size: '512*512'
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `✅ 图片API连接成功！\n响应: ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `❌ 图片API请求失败\n状态码: ${response.status}\n错误信息: ${errorText}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ 图片API连接失败\n错误信息: ${error.message}\n可能原因: CORS限制或API配置问题`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        // 测试CORS代理
+        async function testCORSProxy() {
+            const resultDiv = document.getElementById('imageResult');
+            resultDiv.innerHTML = '正在测试CORS代理方案...';
+            resultDiv.className = 'result';
+
+            // 测试一些公开的CORS代理服务
+            const proxyUrls = [
+                'https://cors-anywhere.herokuapp.com/',
+                'https://api.allorigins.win/raw?url=',
+                'https://api.codetabs.com/v1/proxy?quest='
+            ];
+
+            for (const proxy of proxyUrls) {
+                try {
+                    const testUrl = `${proxy}${encodeURIComponent('https://httpbin.org/json')}`;
+                    const response = await fetch(testUrl);
+                    
+                    if (response.ok) {
+                        resultDiv.innerHTML = `✅ 找到可用的CORS代理: ${proxy}\n建议在生产环境中使用此代理`;
+                        resultDiv.className = 'result success';
+                        return;
+                    }
+                } catch (error) {
+                    console.log(`代理 ${proxy} 不可用:`, error);
+                }
+            }
+
+            resultDiv.innerHTML = `⚠️ 未找到可用的公共CORS代理\n建议使用自定义代理服务或服务端API`;
+            resultDiv.className = 'result warning';
+        }
+
+        // 测试网络连接
+        async function testNetworkConnection() {
+            const resultDiv = document.getElementById('networkResult');
+            resultDiv.innerHTML = '正在测试网络连接...';
+            resultDiv.className = 'result';
+
+            const tests = [
+                { name: '基本网络连接', url: 'https://httpbin.org/json' },
+                { name: '火山引擎可达性', url: 'https://ark.cn-beijing.volces.com' },
+                { name: '阿里云可达性', url: 'https://dashscope.aliyuncs.com' }
+            ];
+
+            let results = [];
+
+            for (const test of tests) {
+                try {
+                    const startTime = Date.now();
+                    const response = await fetch(test.url, { method: 'HEAD', mode: 'no-cors' });
+                    const endTime = Date.now();
+                    results.push(`✅ ${test.name}: 可达 (${endTime - startTime}ms)`);
+                } catch (error) {
+                    results.push(`❌ ${test.name}: 不可达 - ${error.message}`);
+                }
+            }
+
+            resultDiv.innerHTML = results.join('\n');
+            resultDiv.className = 'result';
+        }
+
+        // 页面加载时自动测试基础连接
+        window.addEventListener('load', () => {
+            testNetworkConnection();
+        });
+    </script>
+</body>
+</html>
